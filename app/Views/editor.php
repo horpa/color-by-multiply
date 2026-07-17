@@ -13,9 +13,19 @@
         <button type="button" class="tool-button eraser-button" data-tool="eraser" aria-pressed="false">
             <?= e(t('eraser_tool', $lang)) ?>
         </button>
+
+        <button
+            type="button"
+            class="tool-button palette-add-button"
+            data-color-label="<?= e(t('color_label', $lang)) ?>"
+            data-change-label="<?= e(t('change_color', $lang)) ?>"
+            <?= count($palette) >= $maxPaletteColors ? 'disabled aria-disabled="true"' : '' ?>
+        >
+            <?= e(t('add_color', $lang)) ?>
+        </button>
     </div>
 
-    <div class="palette-row" role="toolbar" aria-label="<?= e(t('color_label', $lang)) ?>">
+    <div class="palette-row" role="toolbar" aria-label="<?= e(t('color_label', $lang)) ?>" data-max-colors="<?= (int) $maxPaletteColors ?>">
         <?php foreach ($palette as $index => $color): ?>
             <?php $gridIndex = $index + 1; ?>
             <div class="palette-item" data-palette-index="<?= $gridIndex ?>">

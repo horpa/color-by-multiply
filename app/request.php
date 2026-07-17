@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Domain\Grid;
+use Domain\Palette;
 use Domain\QuestionMode;
 
 function handle_app_request(): array
@@ -15,6 +16,7 @@ function handle_app_request(): array
     $showEditor = false;
     $questionMode = QuestionMode::Mixed->value;
     $gridSize = Grid::SIZE;
+    $maxPaletteColors = Palette::MAX_FOREGROUND_COLORS;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['grid']) && is_array($_POST['grid'])) {
@@ -93,7 +95,7 @@ function handle_app_request(): array
         $editorGrid = ImageExerciseGenerator::normalizeGridFromPost([], $palette);
     }
 
-    return compact('lang', 'error', 'result', 'editorGrid', 'palette', 'showEditor', 'questionMode', 'gridSize');
+    return compact('lang', 'error', 'result', 'editorGrid', 'palette', 'showEditor', 'questionMode', 'gridSize', 'maxPaletteColors');
 }
 
 function render_app_page(array $state): void
@@ -105,7 +107,7 @@ function render_app_page(array $state): void
     $content .= render('partials/error', compact('error'));
 
     if ($showEditor) {
-        $content .= render('editor', compact('lang', 'palette', 'editorGrid', 'questionMode', 'gridSize'));
+        $content .= render('editor', compact('lang', 'palette', 'editorGrid', 'questionMode', 'gridSize', 'maxPaletteColors'));
     }
 
     if ($result !== null) {
