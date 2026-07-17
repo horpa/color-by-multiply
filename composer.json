@@ -1,0 +1,22 @@
+{
+    "name": "horpa/color-by-multiply",
+    "description": "Turn a 10×10 pixel image into printable multiplication and division practice worksheets.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "ext-gd": "*",
+        "ext-fileinfo": "*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ],
+        "files": [
+            "app/helpers.php"
+        ]
+    },
+    "scripts": {
+        "serve": "php -S localhost:8080 -t public"
+    }
+}

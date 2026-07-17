@@ -1,0 +1,26 @@
+# Dependencies
+/vendor/
+
+# Runtime uploads (keep directory, ignore user files)
+/uploads/*
+!/uploads/.htaccess
+!/uploads/.gitkeep
+
+# OS & editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# PHP
+.phpunit.result.cache
+.phpunit.cache
+
+# Logs & env
+*.log
+.env
+.env.*
