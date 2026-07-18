@@ -62,6 +62,18 @@ Each non-white pixel produces one exercise. Students find the missing **row** (b
 
 The missing value is shown as a colored write-in box matching the grid labels. The pixel’s color chip helps students locate the matching square on the grid.
 
+## User guides
+
+**For teachers**
+
+- [English user guide](docs/user-guide-en.md)
+- [Magyar felhasználói útmutató](docs/user-guide-hu.md)
+
+**For students**
+
+- [How to use your worksheet (EN)](docs/student-guide-en.md)
+- [Hogyan használd a munkalapot (HU)](docs/student-guide-hu.md)
+
 ## Project structure
 
 ```
