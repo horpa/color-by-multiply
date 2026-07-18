@@ -16,4 +16,16 @@ final class Palette
     {
         return [self::FALLBACK_FOREGROUND];
     }
+
+    /** @return list<string> */
+    public static function blankCanvasForeground(): array
+    {
+        return [
+            '#411947',
+            '#8a139c',
+            '#9c7813',
+            '#139c74',
+            '#20332d',
+        ];
+    }
 }

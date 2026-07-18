@@ -167,4 +167,4 @@ A paletta legfeljebb **7 színt** tartalmazhat. Ha már 7 szín van, az **Új sz
 
 ---
 
-*Technikai telepítéshez lásd a fő [README](../README.md) fájlt. Angol útmutató: [User Guide (EN)](user-guide-en.md). Tanulóknak: [Tanulói útmutató (HU)](student-guide-hu.md).*
+*Technikai telepítéshez lásd a fő [README](../README.md) fájlt. Angol útmutató: [User Guide (EN)](user-guide-en.md). Tanulóknak: [Tanulói útmutató (HU)](../?student_guide=1&lang=hu).*

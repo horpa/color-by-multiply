@@ -8,6 +8,19 @@ if (!defined('APP_ROOT')) {
 
 require APP_ROOT . '/app/helpers.php';
 
+$config = require APP_ROOT . '/app/config.php';
+$localConfigPath = APP_ROOT . '/app/config.local.php';
+
+if (is_file($localConfigPath)) {
+    /** @var array<string, mixed> $localConfig */
+    $localConfig = require $localConfigPath;
+    $config = array_merge($config, $localConfig);
+}
+
+if (!defined('APP_CONFIG')) {
+    define('APP_CONFIG', $config);
+}
+
 spl_autoload_register(static function (string $class): void {
     $prefixes = [
         'Domain\\' => APP_ROOT . '/src/Domain/',

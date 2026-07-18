@@ -149,6 +149,111 @@ function render_practice_exercise_formula(array $exercise, string $lang, int $in
     }
 }
 
+function student_guide_url(string $lang): string
+{
+    return '?student_guide=1&lang=' . rawurlencode($lang);
+}
+
+function student_guide_partial(string $lang): string
+{
+    return 'partials/student-guide-' . ($lang === 'en' ? 'en' : 'hu');
+}
+
+function app_config(string $key, mixed $default = null): mixed
+{
+    $config = defined('APP_CONFIG') ? APP_CONFIG : [];
+
+    return $config[$key] ?? $default;
+}
+
+function worksheet_repository(): Infrastructure\WorksheetRepository
+{
+    static $repository = null;
+
+    return $repository ??= new Infrastructure\WorksheetRepository();
+}
+
+function current_request_url(array $params = []): string
+{
+    $query = array_merge($_GET, $params);
+    unset($query['key']);
+
+    foreach ($query as $name => $value) {
+        if ($value === null || $value === '') {
+            unset($query[$name]);
+        }
+    }
+
+    $queryString = http_build_query($query);
+
+    return $queryString === '' ? '?' : '?' . $queryString;
+}
+
+function worksheet_url(string $id, string $lang): string
+{
+    return '?' . http_build_query([
+        'w' => $id,
+        'lang' => $lang,
+    ]);
+}
+
+function practice_url(string $lang, ?string $worksheetId = null): string
+{
+    $params = [
+        'practice' => '1',
+        'lang' => $lang,
+    ];
+
+    if ($worksheetId !== null) {
+        $params['w'] = $worksheetId;
+    }
+
+    return '?' . http_build_query($params);
+}
+
+function preview_url(string $id): string
+{
+    return '?preview=' . rawurlencode($id);
+}
+
+function library_url(string $lang): string
+{
+    return '?' . http_build_query([
+        'lang' => $lang,
+        'home' => '1',
+    ]);
+}
+
+function format_worksheet_date(string $createdAt, string $lang): string
+{
+    if ($createdAt === '') {
+        return '';
+    }
+
+    try {
+        $date = new DateTimeImmutable($createdAt);
+
+        return $date->format($lang === 'hu' ? 'Y. m. d. H:i' : 'M j, Y g:i A');
+    } catch (Exception) {
+        return $createdAt;
+    }
+}
+
+function absolute_url(string $query): string
+{
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $script = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+    $path = str_starts_with($query, '?') ? $query : '?' . $query;
+
+    return $scheme . '://' . $host . $script . $path;
+}
+
+function absolute_worksheet_url(string $id, string $lang): string
+{
+    return absolute_url(worksheet_url($id, $lang));
+}
+
 function view(string $name, array $data = []): void
 {
     extract($data, EXTR_SKIP);

@@ -1,11 +1,43 @@
-<div class="card printable">
-    <div class="no-print worksheet-actions" style="margin-bottom: 1rem;">
-        <button type="button" onclick="window.print()"><?= e(t('print_preview', $lang)) ?></button>
-        <button type="button" onclick="window.open('?practice=1&amp;lang=<?= e($lang) ?>', '_blank', 'noopener,noreferrer')"><?= e(t('practice_button', $lang)) ?></button>
+<?php
+
+/** @var bool $isSavedView */
+/** @var string|null $savedId */
+/** @var string $lang */
+
+$isSavedView = !empty($isSavedView);
+$savedId = isset($savedId) && is_string($savedId) ? $savedId : null;
+$practiceHref = $savedId !== null
+    ? practice_url($lang, $savedId)
+    : practice_url($lang);
+
+?>
+<div class="panel printable">
+    <?php if ($isSavedView): ?>
+        <p class="no-print">
+            <a href="<?= e(library_url($lang)) ?>">← <?= e(t('back_to_library', $lang)) ?></a>
+        </p>
+    <?php endif; ?>
+
+    <p class="worksheet-ready no-print"><?= e(t('worksheet_ready', $lang)) ?></p>
+
+    <div class="worksheet-actions no-print">
+        <?php if (!$isSavedView && $savedId === null): ?>
+            <form method="post" class="worksheet-save-form">
+                <input type="hidden" name="lang" value="<?= e($lang) ?>">
+                <button type="submit" name="save_worksheet" value="1" class="btn btn--primary"><?= e(t('save_share_button', $lang)) ?></button>
+            </form>
+        <?php endif; ?>
+
+        <button type="button" class="btn btn--secondary" onclick="window.print()"><?= e(t('print_preview', $lang)) ?></button>
+        <a class="btn btn--secondary" href="<?= e($practiceHref) ?>" target="_blank" rel="noopener noreferrer"><?= e(t('practice_button', $lang)) ?></a>
     </div>
 
+    <?php if ($savedId !== null): ?>
+        <?php view('partials/share-links', compact('lang', 'savedId')); ?>
+    <?php endif; ?>
+
     <div class="print-page">
-        <h2><?= e(t('worksheet', $lang)) ?></h2>
+        <h2 class="panel__title"><?= e(t('worksheet', $lang)) ?></h2>
         <div class="print-grid">
             <div class="print-grid-header">
                 <div class="print-grid-label"></div>
@@ -32,9 +64,9 @@
             <?php endforeach; ?>
         </div>
 
-        <h3 style="margin-top: 1rem;"><?= e(t('exercises', $lang)) ?></h3>
+        <h3><?= e(t('exercises', $lang)) ?></h3>
         <div class="print-exercises">
-            <?php foreach ($result['exercises'] as $exercise): ?>
+            <?php foreach ($result['exercises'] as $index => $exercise): ?>
                 <div class="print-exercise-item">
                     <?php render_exercise_formula($exercise, $lang); ?>
                     <span class="exercise-color-chip">
@@ -48,7 +80,7 @@
 
     <div class="print-page print-only">
         <img src="data:image/png;base64,<?= base64_encode($result['previewImageData']) ?>" alt="<?= e(t('generated_image', $lang)) ?>" style="max-width: 100%; height: auto; width: 420px;">
-        <h3 style="margin-top: 1rem;"><?= e(t('solutions', $lang)) ?></h3>
+        <h3><?= e(t('solutions', $lang)) ?></h3>
         <div class="print-solution-list">
             <?php foreach ($result['exercises'] as $exercise): ?>
                 <div class="print-solution-item">
@@ -62,3 +94,6 @@
         </div>
     </div>
 </div>
+<?php if (!$isSavedView): ?>
+    <?php view('partials/wizard-nav', ['wizardStep' => 'worksheet', 'lang' => $lang]); ?>
+<?php endif; ?>

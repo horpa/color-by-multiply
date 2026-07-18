@@ -167,4 +167,4 @@ The palette holds a maximum of **7 colors**. When you already have 7 colors, **A
 
 ---
 
-*For technical setup and installation, see the main [README](../README.md). For the Hungarian guide, see [Felhasználói útmutató (HU)](user-guide-hu.md). For students, see [Student guide (EN)](student-guide-en.md).*
+*For technical setup and installation, see the main [README](../README.md). For the Hungarian guide, see [Felhasználói útmutató (HU)](user-guide-hu.md). For students, see [Student guide (EN)](../?student_guide=1&lang=en).*

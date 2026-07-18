@@ -30,7 +30,10 @@ $practicePayload = [
 ?>
 <div class="card practice-page">
     <h1><?= e(t('practice_title', $lang)) ?></h1>
-    <p><?= e(t('practice_intro', $lang)) ?></p>
+    <p>
+        <?= e(t('practice_intro', $lang)) ?>
+        <a class="practice-guide-link" href="<?= e(student_guide_url($lang)) ?>" target="_blank" rel="noopener noreferrer"><?= e(t('practice_guide_link', $lang)) ?></a>
+    </p>
 
     <div class="practice-layout">
         <div class="practice-grid-section">

@@ -70,6 +70,17 @@ class ImageExerciseGenerator
         return self::paletteService()->getDefaultPaletteHex();
     }
 
+    /** @return array{grid: list<list<array{paletteIndex: int}>>, palette: list<string>} */
+    public static function buildBlankEditor(): array
+    {
+        $palette = self::normalizePalette(Palette::blankCanvasForeground());
+
+        return [
+            'grid' => self::gridService()->emptyEditorGrid(),
+            'palette' => $palette,
+        ];
+    }
+
     private static function paletteService(): PaletteService
     {
         return self::$paletteService ??= new PaletteService();

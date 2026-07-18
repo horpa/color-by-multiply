@@ -6,6 +6,15 @@
 !/uploads/.htaccess
 !/uploads/.gitkeep
 
+# Saved worksheets (keep directory, ignore user files)
+/storage/worksheets/*
+!/storage/worksheets/.htaccess
+!/storage/worksheets/.gitkeep
+!/storage/.htaccess
+
+# Local config overrides
+/app/config.local.php
+
 # OS & editor
 .DS_Store
 Thumbs.db

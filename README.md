@@ -13,12 +13,19 @@ Available in **Hungarian** and **English**.
 - **Pixel editor** with color swatches, eraser, click-and-drag painting, and per-color adjustment
 - **Exercise generation** in mixed, multiplication-only, or division-only modes
 - **Print-ready worksheet** with color legend, exercise list, and solution key
+- **Shareable worksheet library** — save worksheets and share a link to the full sheet
+- **Interactive practice** with optional fireworks celebration when complete
 
 ## Requirements
 
 - PHP 8.1 or newer
 - PHP extensions: `gd`, `fileinfo`
 - A web server (Apache, nginx, IIS, or PHP’s built-in server)
+
+Writable directories:
+
+- `uploads/` — temporary uploaded images
+- `storage/worksheets/` — saved worksheets (JSON + preview PNG)
 
 ## Quick start
 
@@ -43,17 +50,28 @@ Open [http://localhost:8080](http://localhost:8080) in your browser.
 Point your web server **document root** to the `public/` directory.
 
 - `public/` — web-accessible entry point and static assets
-- `app/`, `src/`, and `uploads/` must **not** be directly exposed (`.htaccess` files block access on Apache)
+- `app/`, `src/`, `uploads/`, and `storage/` must **not** be directly exposed (`.htaccess` files block access on Apache)
 
-Ensure the `uploads/` directory is writable by the web server process.
+Ensure the `uploads/` and `storage/worksheets/` directories are writable by the web server process.
+
+Delete saved worksheets from the **library** page using the **Delete** button on each row.
 
 ## Usage
 
-1. Choose a language (HU / EN).
-2. Upload an image (JPEG, PNG, WebP, or GIF).
-3. Adjust the pixel grid and palette if needed.
-4. Select a question type and click **Generate exercises**.
-5. Print the worksheet from the browser.
+1. Open the app — the **library** lists saved worksheets (or start fresh with **Create new worksheet**).
+2. Choose a language (HU / EN).
+3. Upload an image (JPEG, PNG, WebP, or GIF) or start from a blank canvas.
+4. Adjust the pixel grid and palette if needed.
+5. Select a question type and click **Generate exercises**.
+6. Click **Save & share** to store the worksheet and get shareable URLs.
+7. Print the worksheet or open interactive practice for students.
+
+### Share URLs
+
+| URL | Opens |
+|-----|--------|
+| `?w={id}` | Full saved worksheet |
+| `?practice=1&w={id}` | Interactive practice (full worksheet) |
 
 Each non-white pixel produces one exercise. Students find the missing **row** (blue) or **column** (green) value:
 
@@ -71,8 +89,8 @@ The missing value is shown as a colored write-in box matching the grid labels. T
 
 **For students**
 
-- [How to use your worksheet (EN)](docs/student-guide-en.md)
-- [Hogyan használd a munkalapot (HU)](docs/student-guide-hu.md)
+- [How to use your worksheet (EN)](?student_guide=1&lang=en) — also linked from interactive practice
+- [Hogyan használd a munkalapot (HU)](?student_guide=1&lang=hu)
 
 ## Project structure
 
@@ -82,7 +100,8 @@ color-by-multiply/
 ├── public/              # Web root (index.php, CSS, JS)
 ├── src/
 │   ├── Domain/          # Grid, palette, exercise logic
-│   └── Infrastructure/  # GD image processing
+│   └── Infrastructure/  # GD image processing, worksheet storage
+├── storage/             # Saved worksheets (gitignored data)
 ├── uploads/             # Temporary uploaded images (gitignored)
 ├── index.php            # Convenience entry when docroot is project root
 ├── LICENSE
