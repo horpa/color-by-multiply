@@ -34,4 +34,11 @@ return [
     'error_store_failed' => 'A fájlt nem sikerült tárolni.',
     'error_invalid_upload' => 'A feltöltött fájl nem érvényes kép.',
     'error_no_colored_pixels' => 'Legalább egy színes pixelt adj hozzá a feladatok generálása előtt.',
+    'practice_button' => 'Interaktív gyakorlás',
+    'practice_title' => 'Oldd meg és színezd ki',
+    'practice_intro' => 'Írd be a hiányzó sor vagy oszlop számát. Minden helyes válasz egy négyzetet színez ki a rácson.',
+    'practice_correct' => 'Helyes!',
+    'practice_wrong' => 'Próbáld újra',
+    'practice_complete' => 'Szép munka! Kirajzoltad a teljes képet.',
+    'practice_unavailable' => 'Először generálj munkalapot.',
 ];

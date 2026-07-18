@@ -29,6 +29,12 @@ function handle_app_request(): array
 
             try {
                 $result = ImageExerciseGenerator::processGrid($editorGrid, $palette, $questionMode);
+                $_SESSION['worksheet_result'] = [
+                    'grid' => $result['grid'],
+                    'exercises' => $result['exercises'],
+                    'palette' => $result['palette'],
+                    'previewImageData' => $result['previewImageData'],
+                ];
                 $showEditor = true;
             } catch (RuntimeException $exception) {
                 if (str_contains($exception->getMessage(), 'colored pixel')) {
@@ -95,6 +101,10 @@ function handle_app_request(): array
         $editorGrid = ImageExerciseGenerator::normalizeGridFromPost([], $palette);
     }
 
+    if ($result === null && !empty($_SESSION['worksheet_result'])) {
+        $result = $_SESSION['worksheet_result'];
+    }
+
     return compact('lang', 'error', 'result', 'editorGrid', 'palette', 'showEditor', 'questionMode', 'gridSize', 'maxPaletteColors');
 }
 
@@ -115,4 +125,29 @@ function render_app_page(array $state): void
     }
 
     view('layout', compact('lang', 'content'));
+}
+
+function handle_practice_request(): array
+{
+    $lang = resolve_lang();
+    $gridSize = Grid::SIZE;
+    $result = $_SESSION['worksheet_result'] ?? null;
+    $available = is_array($result) && !empty($result['exercises']);
+
+    return compact('lang', 'gridSize', 'result', 'available');
+}
+
+function render_practice_page(array $state): void
+{
+    extract($state, EXTR_SKIP);
+
+    if (!$available) {
+        $content = render('partials/practice-unavailable', compact('lang'));
+        view('layout-practice', compact('lang', 'content'));
+
+        return;
+    }
+
+    $content = render('practice', compact('lang', 'result', 'gridSize'));
+    view('layout-practice', compact('lang', 'content'));
 }

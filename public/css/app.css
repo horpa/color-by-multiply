@@ -46,6 +46,29 @@ form { margin-bottom: 2rem; }
 .print-solution-item { border: 1px solid #ddd; padding: 0.25rem 0.4rem; }
 .error-message { color: #b00020; font-weight: bold; }
 .card { margin-top: 2rem; }
+.worksheet-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+.practice-page { max-width: 1100px; }
+.practice-layout { display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start; }
+.practice-grid-section { flex: 0 0 auto; }
+.practice-exercises-section { flex: 1 1 280px; min-width: 0; }
+.practice-exercises { columns: 1; }
+@media (min-width: 700px) {
+    .practice-exercises { columns: 2; }
+}
+@media (min-width: 1000px) {
+    .practice-exercises { columns: 3; }
+}
+.practice-grid-cell { transition: background-color 0.25s ease; }
+.practice-grid-cell--filled { border-color: #888; }
+.practice-answer { width: 36px; height: 36px; padding: 0; text-align: center; font-size: 1rem; font-weight: 700; box-sizing: border-box; border-radius: 3px; vertical-align: middle; }
+.practice-answer--row { background: #e8f0ff; border: 2px solid #0b5fff; }
+.practice-answer--column { background: #e6f4ea; border: 2px solid #198754; }
+.practice-answer--correct { border-color: #198754; background: #e6f4ea; }
+.practice-answer--wrong { border-color: #b00020; background: #fff0f0; }
+.practice-feedback { font-size: 0.85rem; font-weight: 700; min-width: 4rem; }
+.practice-feedback--correct { color: #198754; }
+.practice-feedback--wrong { color: #b00020; }
+.practice-complete { margin-top: 1.5rem; padding: 1rem; border: 2px solid #198754; background: #e6f4ea; border-radius: 4px; font-weight: 700; font-size: 1.1rem; }
 
 @media print {
     body { margin: 0; }

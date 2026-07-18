@@ -1,6 +1,7 @@
 <div class="card printable">
-    <div class="no-print" style="margin-bottom: 1rem;">
+    <div class="no-print worksheet-actions" style="margin-bottom: 1rem;">
         <button type="button" onclick="window.print()"><?= e(t('print_preview', $lang)) ?></button>
+        <button type="button" onclick="window.open('?practice=1&amp;lang=<?= e($lang) ?>', '_blank', 'noopener,noreferrer')"><?= e(t('practice_button', $lang)) ?></button>
     </div>
 
     <div class="print-page">

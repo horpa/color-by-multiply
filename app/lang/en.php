@@ -34,4 +34,11 @@ return [
     'error_store_failed' => 'The file could not be stored.',
     'error_invalid_upload' => 'The uploaded file is not a valid image.',
     'error_no_colored_pixels' => 'Add at least one colored pixel before generating exercises.',
+    'practice_button' => 'Interactive practice',
+    'practice_title' => 'Solve and color',
+    'practice_intro' => 'Type the missing row or column number. Each correct answer fills one square on the grid.',
+    'practice_correct' => 'Correct!',
+    'practice_wrong' => 'Try again',
+    'practice_complete' => 'Well done! You revealed the whole picture.',
+    'practice_unavailable' => 'Generate a worksheet first.',
 ];
