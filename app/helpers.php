@@ -64,6 +64,45 @@ function e(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+/** @param array<string, mixed> $exercise */
+function render_exercise_formula(array $exercise, string $lang): void
+{
+    $isMultiplication = $exercise['type'] === 'multiplication';
+    $solveForRow = ($exercise['solveFor'] ?? 'row') === 'row';
+    $rowBlankLabel = e(t('color_label', $lang) . ' ' . ($exercise['row'] ?? ''));
+    $columnBlankLabel = e(t('color_label', $lang) . ' ' . ($exercise['column'] ?? ''));
+
+    if ($isMultiplication) {
+        if ($solveForRow) {
+            echo '<span class="exercise-blank exercise-blank--row" aria-label="' . $rowBlankLabel . '"></span>';
+            echo '<span>×</span>';
+            echo '<span class="exercise-green">' . e((string) $exercise['y']) . '</span>';
+        } else {
+            echo '<span class="exercise-blue">' . e((string) $exercise['x']) . '</span>';
+            echo '<span>×</span>';
+            echo '<span class="exercise-blank exercise-blank--column" aria-label="' . $columnBlankLabel . '"></span>';
+        }
+
+        echo '<span>=</span>';
+        echo '<span>' . e((string) $exercise['a']) . '</span>';
+
+        return;
+    }
+
+    echo '<span>' . e((string) $exercise['a']) . '</span>';
+    echo '<span>÷</span>';
+
+    if ($solveForRow) {
+        echo '<span class="exercise-blank exercise-blank--row" aria-label="' . $rowBlankLabel . '"></span>';
+        echo '<span>=</span>';
+        echo '<span class="exercise-green">' . e((string) $exercise['y']) . '</span>';
+    } else {
+        echo '<span class="exercise-blue">' . e((string) $exercise['x']) . '</span>';
+        echo '<span>=</span>';
+        echo '<span class="exercise-blank exercise-blank--column" aria-label="' . $columnBlankLabel . '"></span>';
+    }
+}
+
 function view(string $name, array $data = []): void
 {
     extract($data, EXTR_SKIP);

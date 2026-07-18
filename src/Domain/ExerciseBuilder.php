@@ -29,6 +29,8 @@ final class ExerciseBuilder
         $y = (int) $pixel['column'];
         $a = $x * $y;
         $colorIndex = (int) ($pixel['colorIndex'] ?? $pixel['paletteIndex']);
+        $solveFor = $index % 2 === 0 ? 'row' : 'column';
+        $answer = $solveFor === 'row' ? $x : $y;
 
         $isMultiplication = match ($mode) {
             QuestionMode::Multiplication => true,
@@ -37,6 +39,10 @@ final class ExerciseBuilder
         };
 
         if ($isMultiplication) {
+            $question = $solveFor === 'row'
+                ? sprintf('□ × %d = %d', $y, $a)
+                : sprintf('%d × □ = %d', $x, $a);
+
             return new Exercise(
                 row: $pixel['row'],
                 column: $pixel['column'],
@@ -46,11 +52,16 @@ final class ExerciseBuilder
                 x: $x,
                 y: $y,
                 type: 'multiplication',
-                question: sprintf('%d × <span class="var x">□</span> = %d', $x, $a),
-                answer: $y,
+                solveFor: $solveFor,
+                question: $question,
+                answer: $answer,
                 display: sprintf('%d × %d = %d', $x, $y, $a),
             );
         }
+
+        $question = $solveFor === 'row'
+            ? sprintf('%d ÷ □ = %d', $a, $y)
+            : sprintf('%d ÷ %d = □', $a, $x);
 
         return new Exercise(
             row: $pixel['row'],
@@ -61,8 +72,9 @@ final class ExerciseBuilder
             x: $x,
             y: $y,
             type: 'division',
-            question: sprintf('%d ÷ <span class="var x">□</span> = %d', $a, $y),
-            answer: $y,
+            solveFor: $solveFor,
+            question: $question,
+            answer: $answer,
             display: sprintf('%d ÷ %d = %d', $a, $x, $y),
         );
     }

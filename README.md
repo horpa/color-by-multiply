@@ -55,12 +55,12 @@ Ensure the `uploads/` directory is writable by the web server process.
 4. Select a question type and click **Generate exercises**.
 5. Print the worksheet from the browser.
 
-Each non-white pixel produces one exercise:
+Each non-white pixel produces one exercise. Students find the missing **row** (blue) or **column** (green) value:
 
-- **Multiplication:** row × column = ?
-- **Division:** (row × column) ÷ row = ? (or ÷ column)
+- **Multiplication:** `□ × 4 = 12` (find row) or `3 × □ = 12` (find column)
+- **Division:** `12 ÷ □ = 4` (find row) or `12 ÷ 3 = □` (find column)
 
-The pixel’s color is shown next to the answer field so students can fill in the matching square on the grid.
+The missing value is shown as a colored write-in box matching the grid labels. The pixel’s color chip helps students locate the matching square on the grid.
 
 ## Project structure
 

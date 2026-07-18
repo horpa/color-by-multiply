@@ -33,22 +33,9 @@
 
         <h3 style="margin-top: 1rem;"><?= e(t('exercises', $lang)) ?></h3>
         <div class="print-exercises">
-            <?php foreach ($result['exercises'] as $index => $exercise): ?>
+            <?php foreach ($result['exercises'] as $exercise): ?>
                 <div class="print-exercise-item">
-                    <span><?= $index + 1 ?>.</span>
-                    <?php if ($exercise['type'] === 'multiplication'): ?>
-                        <span class="exercise-blue"><?= e((string) $exercise['x']) ?></span>
-                        <span>×</span>
-                        <span class="exercise-green"><?= e((string) $exercise['y']) ?></span>
-                        <span>=</span>
-                        <span>?</span>
-                    <?php else: ?>
-                        <span><?= e((string) $exercise['a']) ?></span>
-                        <span>÷</span>
-                        <span class="exercise-blue"><?= e((string) $exercise['x']) ?></span>
-                        <span>=</span>
-                        <span>?</span>
-                    <?php endif; ?>
+                    <?php render_exercise_formula($exercise, $lang); ?>
                     <span class="exercise-color-chip">
                         <span class="exercise-color-chip__swatch" style="background-color: <?= e($exercise['color']) ?>"></span>
                         <span class="exercise-color-chip__number"><?= e((string) $exercise['colorIndex']) ?></span>
@@ -62,9 +49,8 @@
         <img src="data:image/png;base64,<?= base64_encode($result['previewImageData']) ?>" alt="<?= e(t('generated_image', $lang)) ?>" style="max-width: 100%; height: auto; width: 420px;">
         <h3 style="margin-top: 1rem;"><?= e(t('solutions', $lang)) ?></h3>
         <div class="print-solution-list">
-            <?php foreach ($result['exercises'] as $index => $exercise): ?>
+            <?php foreach ($result['exercises'] as $exercise): ?>
                 <div class="print-solution-item">
-                    <strong><?= $index + 1 ?>.</strong>
                     <?php if ($exercise['type'] === 'multiplication'): ?>
                         <?= e((string) $exercise['x']) ?> × <?= e((string) $exercise['y']) ?> = <?= e((string) $exercise['a']) ?>
                     <?php else: ?>

@@ -19,6 +19,9 @@ form { margin-bottom: 2rem; }
 .palette-color-inputs { display: none; }
 .exercise-blue { color: #0b5fff; font-weight: 700; }
 .exercise-green { color: #198754; font-weight: 700; }
+.exercise-blank { display: inline-block; width: 36px; height: 36px; vertical-align: middle; box-sizing: border-box; border-radius: 3px; }
+.exercise-blank--row { background: #e8f0ff; border: 2px solid #0b5fff; }
+.exercise-blank--column { background: #e6f4ea; border: 2px solid #198754; }
 .printable { background: white; padding: 1rem; }
 .print-page { page-break-after: always; }
 .print-page:last-child { page-break-after: auto; }
@@ -29,8 +32,8 @@ form { margin-bottom: 2rem; }
 .print-grid-header { display: flex; align-items: flex-end; }
 .print-grid-label-blue { color: #0b5fff; }
 .print-grid-label-green { color: #198754; }
-.print-exercises { columns: 2; column-gap: 1.5rem; }
-.print-exercise-item { break-inside: avoid; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; }
+.print-exercises { columns: 3; column-gap: 2rem; }
+.print-exercise-item { break-inside: avoid; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .print-only { display: none; }
 .print-color-legend { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0.75rem 0 1rem; }
 .print-color-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.15rem 0.35rem; border: 1px solid #ddd; border-radius: 999px; background: #fafafa; }
@@ -49,7 +52,7 @@ form { margin-bottom: 2rem; }
     .no-print { display: none !important; }
     h1, p { display: none !important; }
     form, .card:not(.printable) { display: none !important; }
-    .exercise-blue, .exercise-green, .exercise-color-chip__swatch, .print-color-swatch {
+    .exercise-blue, .exercise-green, .exercise-blank, .exercise-color-chip__swatch, .print-color-swatch {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
