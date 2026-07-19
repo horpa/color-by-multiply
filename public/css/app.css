@@ -651,6 +651,14 @@ form { margin-bottom: 0; }
 
 .print-page:last-child { page-break-after: auto; }
 
+.worksheet-visuals {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1.25rem 2rem;
+    margin-bottom: 0.25rem;
+}
+
 .print-grid { display: inline-block; padding: 0.5rem; }
 
 .print-grid-row { display: flex; align-items: center; }
@@ -685,9 +693,47 @@ form { margin-bottom: 0; }
 
 .exercise-color-chip__number { font-weight: 700; min-width: 1rem; text-align: center; }
 
-.print-solution-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem; }
+.print-header { margin-bottom: 0.75rem; }
 
-.print-solution-item { border: 1px solid #ddd; padding: 0.25rem 0.4rem; }
+.print-header__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+}
+
+.print-header__title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.print-header__intro {
+    margin: 0.35rem 0 0;
+    color: var(--color-muted);
+    font-size: 0.95rem;
+    max-width: 36rem;
+}
+
+.print-ref {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+    white-space: nowrap;
+}
+
+.print-preview-image {
+    display: block;
+    max-width: 100%;
+    width: 420px;
+    height: auto;
+}
 
 .error-message {
     color: #b00020;
@@ -1220,25 +1266,56 @@ form { margin-bottom: 0; }
     .wizard-stepper__item { padding: 0.5rem 0; }
 }
 
+@page {
+    size: A4;
+    margin: 12mm 14mm;
+}
+
 @media print {
-    body { margin: 0; background: #fff; }
+    body { margin: 0; background: #fff; color: #000; }
 
     .app-shell { max-width: none; padding: 0; }
 
     .app-header, .wizard-stepper, .wizard-nav, .worksheet-ready, .no-print { display: none !important; }
 
-    .panel { border: none; box-shadow: none; padding: 0; }
+    .panel { border: none; box-shadow: none; padding: 0; background: #fff; }
 
     form:not(#pixel-editor-form) { display: none !important; }
 
     .card:not(.printable), #pixel-editor-form { display: none !important; }
 
-    .exercise-blue, .exercise-green, .exercise-blank, .exercise-color-chip__swatch, .print-color-swatch {
+    .print-only { display: block !important; }
+
+    .printable {
+        padding: 0;
+        background: #fff;
+        zoom: 0.8;
+    }
+
+    .print-header { margin-bottom: 0.5rem; }
+
+    .print-header__title { font-size: 1.25rem; color: #000; }
+
+    .print-header__intro {
+        margin: 0.25rem 0 0;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .print-ref { color: #333; }
+
+    .print-color-chip,
+    .exercise-color-chip {
+        background: transparent;
+    }
+
+    .print-grid-cell,
+    .print-color-swatch,
+    .exercise-color-chip__swatch,
+    .exercise-blank,
+    .exercise-blue,
+    .exercise-green {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-
-    .print-only { display: block !important; }
-
-    .printable { padding: 0; }
 }

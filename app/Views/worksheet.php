@@ -9,6 +9,13 @@ $savedId = isset($savedId) && is_string($savedId) ? $savedId : null;
 $practiceHref = $savedId !== null
     ? practice_url($lang, $savedId)
     : practice_url($lang);
+$printRef = $savedId !== null
+    ? strtoupper($savedId)
+    : strtoupper(substr(hash('crc32b', serialize([
+        $result['exercises'] ?? [],
+        $result['palette'] ?? [],
+        $result['grid'] ?? [],
+    ])), 0, 8));
 
 ?>
 <div class="panel printable">
@@ -36,22 +43,46 @@ $practiceHref = $savedId !== null
     <?php endif; ?>
 
     <div class="print-page">
-        <h2 class="panel__title"><?= e(t('worksheet', $lang)) ?></h2>
-        <div class="print-grid">
-            <div class="print-grid-header">
-                <div class="print-grid-label"></div>
-                <?php for ($col = 1; $col <= $gridSize; $col++): ?>
-                    <div class="print-grid-label print-grid-label-green"><?= $col ?></div>
-                <?php endfor; ?>
+        <header class="print-header">
+            <div class="print-header__top">
+                <h2 class="print-header__title"><?= e(t('print_worksheet_title', $lang)) ?></h2>
+                <p class="print-ref"><?= e(t('print_worksheet_ref', $lang)) ?> <?= e($printRef) ?></p>
             </div>
-            <?php foreach ($result['grid'] as $row => $cells): ?>
-                <div class="print-grid-row">
-                    <div class="print-grid-label print-grid-label-blue"><?= $row + 1 ?></div>
-                    <?php foreach ($cells as $cell): ?>
-                        <div class="print-grid-cell" style="background: <?= e($cell['hex']) ?>"></div>
-                    <?php endforeach; ?>
+            <p class="print-header__intro"><?= e(t('print_worksheet_intro', $lang)) ?></p>
+        </header>
+        <div class="worksheet-visuals">
+            <div class="print-grid" aria-label="<?= e(t('worksheet', $lang)) ?>">
+                <div class="print-grid-header">
+                    <div class="print-grid-label"></div>
+                    <?php for ($col = 1; $col <= $gridSize; $col++): ?>
+                        <div class="print-grid-label print-grid-label-green"><?= $col ?></div>
+                    <?php endfor; ?>
                 </div>
-            <?php endforeach; ?>
+                <?php foreach ($result['grid'] as $row => $cells): ?>
+                    <div class="print-grid-row">
+                        <div class="print-grid-label print-grid-label-blue"><?= $row + 1 ?></div>
+                        <?php foreach ($cells as $cell): ?>
+                            <div class="print-grid-cell" style="background: #ffffff"></div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div class="print-grid worksheet-preview no-print" aria-label="<?= e(t('generated_image', $lang)) ?>">
+                <div class="print-grid-header">
+                    <div class="print-grid-label"></div>
+                    <?php for ($col = 1; $col <= $gridSize; $col++): ?>
+                        <div class="print-grid-label print-grid-label-green"><?= $col ?></div>
+                    <?php endfor; ?>
+                </div>
+                <?php foreach ($result['grid'] as $row => $cells): ?>
+                    <div class="print-grid-row">
+                        <div class="print-grid-label print-grid-label-blue"><?= $row + 1 ?></div>
+                        <?php foreach ($cells as $cell): ?>
+                            <div class="print-grid-cell" style="background: <?= e($cell['hex']) ?>"></div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
 
         <div class="print-color-legend" aria-label="<?= e(t('colors', $lang)) ?>">
@@ -78,19 +109,13 @@ $practiceHref = $savedId !== null
     </div>
 
     <div class="print-page print-only">
-        <img src="data:image/png;base64,<?= base64_encode($result['previewImageData']) ?>" alt="<?= e(t('generated_image', $lang)) ?>" style="max-width: 100%; height: auto; width: 420px;">
-        <h3><?= e(t('solutions', $lang)) ?></h3>
-        <div class="print-solution-list">
-            <?php foreach ($result['exercises'] as $exercise): ?>
-                <div class="print-solution-item">
-                    <?php if ($exercise['type'] === 'multiplication'): ?>
-                        <?= e((string) $exercise['x']) ?> × <?= e((string) $exercise['y']) ?> = <?= e((string) $exercise['a']) ?>
-                    <?php else: ?>
-                        <?= e((string) $exercise['a']) ?> ÷ <?= e((string) $exercise['x']) ?> = <?= e((string) $exercise['y']) ?>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-        </div>
+        <header class="print-header">
+            <div class="print-header__top">
+                <h2 class="print-header__title"><?= e(t('generated_image', $lang)) ?></h2>
+                <p class="print-ref"><?= e(t('print_worksheet_ref', $lang)) ?> <?= e($printRef) ?></p>
+            </div>
+        </header>
+        <img class="print-preview-image" src="data:image/png;base64,<?= base64_encode($result['previewImageData']) ?>" alt="<?= e(t('generated_image', $lang)) ?>">
     </div>
 </div>
 <?php if (!$isSavedView): ?>
