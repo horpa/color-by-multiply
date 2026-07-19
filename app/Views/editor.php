@@ -1,3 +1,52 @@
+<?php
+$canReprocessUpload = !empty($canReprocessUpload);
+$uploadOptions = is_array($uploadOptions ?? null) ? $uploadOptions : [
+    'boost_contrast' => true,
+    'sharpen_edges' => true,
+    'map_to_pencil_set' => true,
+];
+?>
+<?php if ($canReprocessUpload): ?>
+    <form method="post" class="panel editor-reprocess-panel">
+        <input type="hidden" name="lang" value="<?= e($lang) ?>">
+        <input type="hidden" name="reprocess_upload" value="1">
+        <details class="editor-reprocess">
+            <summary class="editor-reprocess__summary">
+                <span class="editor-reprocess__title"><?= e(t('reprocess_title', $lang)) ?></span>
+                <span class="editor-reprocess__lead"><?= e(t('reprocess_summary', $lang)) ?></span>
+            </summary>
+            <p class="editor-reprocess__hint"><?= e(t('reprocess_hint', $lang)) ?></p>
+            <p class="panel__section-title"><?= e(t('upload_options_title', $lang)) ?></p>
+            <ul class="option-list">
+                <li>
+                    <label>
+                        <input type="hidden" name="boost_contrast" value="0">
+                        <input type="checkbox" name="boost_contrast" value="1"<?= !empty($uploadOptions['boost_contrast']) ? ' checked' : '' ?>>
+                        <?= e(t('boost_contrast', $lang)) ?>
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="hidden" name="sharpen_edges" value="0">
+                        <input type="checkbox" name="sharpen_edges" value="1"<?= !empty($uploadOptions['sharpen_edges']) ? ' checked' : '' ?>>
+                        <?= e(t('sharpen_edges', $lang)) ?>
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="hidden" name="map_to_pencil_set" value="0">
+                        <input type="checkbox" name="map_to_pencil_set" value="1"<?= !empty($uploadOptions['map_to_pencil_set']) ? ' checked' : '' ?>>
+                        <?= e(t('map_to_pencil_set', $lang)) ?>
+                    </label>
+                </li>
+            </ul>
+            <div class="form-actions">
+                <button type="submit" class="btn btn--secondary"><?= e(t('reprocess_button', $lang)) ?></button>
+            </div>
+        </details>
+    </form>
+<?php endif; ?>
+
 <form method="post" class="panel" id="pixel-editor-form">
     <input type="hidden" name="lang" value="<?= e($lang) ?>">
     <h2 class="panel__title"><?= e(t('wizard_step_edit', $lang)) ?></h2>

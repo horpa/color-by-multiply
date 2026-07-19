@@ -15,14 +15,18 @@ class ImageExerciseGenerator
     private static ?ExerciseBuilder $exerciseBuilder = null;
     private static ?GdImageProcessor $imageProcessor = null;
 
-    public static function buildEditorFromFile(string $path, ?string $mimeType = null, ?array $palette = null): array
-    {
+    public static function buildEditorFromFile(
+        string $path,
+        ?string $mimeType = null,
+        ?array $palette = null,
+        bool $mapToPencilSet = false,
+    ): array {
         if (!is_file($path)) {
             throw new RuntimeException('The uploaded file could not be found.');
         }
 
-        $resolvedPalette = self::imageProcessor()->resolvePalette($path, $mimeType, $palette);
-        $grid = self::imageProcessor()->buildGridFromImage($path, $mimeType, $resolvedPalette);
+        $resolvedPalette = self::imageProcessor()->resolvePalette($path, $mimeType, $palette, $mapToPencilSet);
+        $grid = self::imageProcessor()->buildGridFromImage($path, $mimeType, $resolvedPalette, $mapToPencilSet);
 
         return [
             'grid' => self::gridService()->toEditorFormat($grid),

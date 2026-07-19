@@ -34,6 +34,13 @@ $defaultPresetColors = $palettePresets[$defaultPresetId];
                 <?= e(t('sharpen_edges', $lang)) ?>
             </label>
         </li>
+        <li>
+            <label>
+                <input type="hidden" name="map_to_pencil_set" value="0">
+                <input type="checkbox" name="map_to_pencil_set" value="1" checked>
+                <?= e(t('map_to_pencil_set', $lang)) ?>
+            </label>
+        </li>
     </ul>
 
     <div class="form-actions">

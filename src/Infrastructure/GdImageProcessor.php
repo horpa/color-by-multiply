@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Infrastructure;
 
 use Domain\Grid;
+use Domain\Palette;
 use Domain\PaletteService;
 use RuntimeException;
 
 final class GdImageProcessor
 {
+    /** Minimum share of non-background pixels in a block to keep a colored cell. */
+    private const CELL_FOREGROUND_COVERAGE = 0.35;
+
     public function __construct(
         private readonly PaletteService $paletteService = new PaletteService(),
     ) {
@@ -27,17 +31,19 @@ final class GdImageProcessor
         }
 
         $image = $this->flattenAlphaToWhite($image);
+        $cropped = $this->centerCropSquare($image);
+        imagedestroy($image);
+
+        $resized = $this->resizeAreaAverage($cropped, Grid::SIZE, Grid::SIZE);
+        imagedestroy($cropped);
 
         if (!empty($options['boost_contrast'])) {
-            $image = $this->boostContrast($image);
+            $resized = $this->boostContrast($resized);
         }
 
         if (!empty($options['sharpen_edges'])) {
-            $image = $this->sharpenImage($image);
+            $resized = $this->sharpenImage($resized);
         }
-
-        $resized = $this->resizeNearestNeighbor($image, Grid::SIZE, Grid::SIZE);
-        imagedestroy($image);
 
         $directory = dirname($outputPath);
         if (!is_dir($directory)) {
@@ -51,23 +57,27 @@ final class GdImageProcessor
     }
 
     /** @return list<string> */
-    public function resolvePalette(string $path, ?string $mimeType = null, ?array $palette = null): array
-    {
+    public function resolvePalette(
+        string $path,
+        ?string $mimeType = null,
+        ?array $palette = null,
+        bool $mapToPencilSet = false,
+    ): array {
         if (is_array($palette) && $palette !== []) {
             return $this->paletteService->normalizeForegroundPalette($palette);
         }
 
-        $image = $this->loadImage($path, $mimeType);
-        if ($image === false) {
+        $gridImage = $this->loadGridImage($path, $mimeType);
+        if ($gridImage === false) {
             return $this->paletteService->getDefaultPaletteHex();
         }
 
-        $image = $this->flattenAlphaToWhite($image);
-        $resized = $this->resizeNearestNeighbor($image, Grid::SIZE, Grid::SIZE);
-        imagedestroy($image);
-
-        $resolvedPalette = $this->paletteService->extractFromImage($resized);
-        imagedestroy($resized);
+        $resolvedPalette = $this->paletteService->extractFromImage(
+            $gridImage,
+            Palette::MAX_FOREGROUND_COLORS,
+            $mapToPencilSet,
+        );
+        imagedestroy($gridImage);
 
         return $this->paletteService->normalizeForegroundPalette($resolvedPalette);
     }
@@ -76,29 +86,41 @@ final class GdImageProcessor
      * @param list<string> $foregroundPalette
      * @return list<list<array{paletteIndex: int}>>
      */
-    public function buildGridFromImage(string $path, ?string $mimeType, array $foregroundPalette): array
-    {
+    public function buildGridFromImage(
+        string $path,
+        ?string $mimeType,
+        array $foregroundPalette,
+        bool $mapToPencilSet = false,
+    ): array {
         $foregroundPalette = $this->paletteService->normalizeForegroundPalette($foregroundPalette);
-        $resized = $this->createPreparedGridImage($path, $mimeType);
+        $gridImage = $this->createPreparedGridImage($path, $mimeType);
 
         $grid = [];
 
         for ($row = 0; $row < Grid::SIZE; $row++) {
             for ($col = 0; $col < Grid::SIZE; $col++) {
-                $rgba = $this->paletteService->readPixel($resized, $col, $row);
-                $paletteIndex = $this->paletteService->quantizeToGridIndex(
-                    $rgba['red'],
-                    $rgba['green'],
-                    $rgba['blue'],
-                    $rgba['alpha'],
-                    $foregroundPalette
-                );
+                $rgba = $this->paletteService->readPixel($gridImage, $col, $row);
+                $paletteIndex = $mapToPencilSet
+                    ? $this->paletteService->quantizeToPencilGridIndex(
+                        $rgba['red'],
+                        $rgba['green'],
+                        $rgba['blue'],
+                        $rgba['alpha'],
+                        $foregroundPalette,
+                    )
+                    : $this->paletteService->quantizeToGridIndex(
+                        $rgba['red'],
+                        $rgba['green'],
+                        $rgba['blue'],
+                        $rgba['alpha'],
+                        $foregroundPalette,
+                    );
 
                 $grid[$row][$col] = ['paletteIndex' => $paletteIndex];
             }
         }
 
-        imagedestroy($resized);
+        imagedestroy($gridImage);
 
         return $grid;
     }
@@ -159,19 +181,44 @@ final class GdImageProcessor
         return $previewImageData;
     }
 
-    /** @return resource */
-    private function createPreparedGridImage(string $path, ?string $mimeType)
+    /**
+     * Load an image already prepared as Grid::SIZE×Grid::SIZE, or downscale as a fallback.
+     *
+     * @return resource|false
+     */
+    private function loadGridImage(string $path, ?string $mimeType)
     {
         $image = $this->loadImage($path, $mimeType);
         if ($image === false) {
-            throw new RuntimeException('The uploaded file is not a valid image.');
+            return false;
+        }
+
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        if ($width === Grid::SIZE && $height === Grid::SIZE) {
+            return $image;
         }
 
         $image = $this->flattenAlphaToWhite($image);
-        $resized = $this->resizeNearestNeighbor($image, Grid::SIZE, Grid::SIZE);
+        $cropped = $this->centerCropSquare($image);
         imagedestroy($image);
 
+        $resized = $this->resizeAreaAverage($cropped, Grid::SIZE, Grid::SIZE);
+        imagedestroy($cropped);
+
         return $resized;
+    }
+
+    /** @return resource */
+    private function createPreparedGridImage(string $path, ?string $mimeType)
+    {
+        $gridImage = $this->loadGridImage($path, $mimeType);
+        if ($gridImage === false) {
+            throw new RuntimeException('The uploaded file is not a valid image.');
+        }
+
+        return $gridImage;
     }
 
     /** @return resource|false */
@@ -222,29 +269,123 @@ final class GdImageProcessor
     }
 
     /** @param resource $image @return resource */
+    private function centerCropSquare($image)
+    {
+        $width = imagesx($image);
+        $height = imagesy($image);
+        $side = min($width, $height);
+        $offsetX = (int) floor(($width - $side) / 2);
+        $offsetY = (int) floor(($height - $side) / 2);
+
+        $cropped = imagecreatetruecolor($side, $side);
+        $white = imagecolorallocate($cropped, 255, 255, 255);
+        imagefill($cropped, 0, 0, $white);
+        imagecopy($cropped, $image, 0, 0, $offsetX, $offsetY, $side, $side);
+
+        return $cropped;
+    }
+
+    /**
+     * Downscale by averaging each destination cell over its source rectangle.
+     * Cells that are mostly background stay white; otherwise use the mean of
+     * non-background pixels.
+     *
+     * @param resource $image
+     * @return resource
+     */
+    private function resizeAreaAverage($image, int $targetWidth, int $targetHeight)
+    {
+        $sourceWidth = imagesx($image);
+        $sourceHeight = imagesy($image);
+        $resized = imagecreatetruecolor($targetWidth, $targetHeight);
+        $white = imagecolorallocate($resized, 255, 255, 255);
+        imagefill($resized, 0, 0, $white);
+
+        for ($targetX = 0; $targetX < $targetWidth; $targetX++) {
+            for ($targetY = 0; $targetY < $targetHeight; $targetY++) {
+                $x0 = (int) floor($targetX * $sourceWidth / $targetWidth);
+                $y0 = (int) floor($targetY * $sourceHeight / $targetHeight);
+                $x1 = (int) floor(($targetX + 1) * $sourceWidth / $targetWidth);
+                $y1 = (int) floor(($targetY + 1) * $sourceHeight / $targetHeight);
+                $x1 = max($x1, $x0 + 1);
+                $y1 = max($y1, $y0 + 1);
+
+                $sumR = 0;
+                $sumG = 0;
+                $sumB = 0;
+                $foregroundCount = 0;
+                $totalCount = 0;
+
+                for ($x = $x0; $x < $x1; $x++) {
+                    for ($y = $y0; $y < $y1; $y++) {
+                        $rgba = $this->paletteService->readPixel($image, $x, $y);
+                        $totalCount++;
+
+                        if ($this->paletteService->isBackgroundPixel(
+                            $rgba['red'],
+                            $rgba['green'],
+                            $rgba['blue'],
+                            $rgba['alpha'],
+                        )) {
+                            continue;
+                        }
+
+                        $sumR += $rgba['red'];
+                        $sumG += $rgba['green'];
+                        $sumB += $rgba['blue'];
+                        $foregroundCount++;
+                    }
+                }
+
+                if ($totalCount === 0 || $foregroundCount / $totalCount < self::CELL_FOREGROUND_COVERAGE) {
+                    continue;
+                }
+
+                $red = (int) round($sumR / $foregroundCount);
+                $green = (int) round($sumG / $foregroundCount);
+                $blue = (int) round($sumB / $foregroundCount);
+                $color = imagecolorallocate($resized, $red, $green, $blue);
+                imagesetpixel($resized, $targetX, $targetY, $color);
+            }
+        }
+
+        return $resized;
+    }
+
+    /** @param resource $image @return resource */
     private function boostContrast($image)
     {
         $width = imagesx($image);
         $height = imagesy($image);
         $min = 255;
         $max = 0;
+        $hasForeground = false;
 
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
                 $rgba = $this->paletteService->readPixel($image, $x, $y);
+                if ($this->paletteService->isBackgroundPixel($rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha'])) {
+                    continue;
+                }
+
+                $hasForeground = true;
                 $luminance = (int) ((0.299 * $rgba['red']) + (0.587 * $rgba['green']) + (0.114 * $rgba['blue']));
                 $min = min($min, $luminance);
                 $max = max($max, $luminance);
             }
         }
 
-        if ($max <= $min) {
+        if (!$hasForeground || $max <= $min) {
             return $image;
         }
 
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
                 $rgba = $this->paletteService->readPixel($image, $x, $y);
+                if ($this->paletteService->isBackgroundPixel($rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha'])) {
+                    continue;
+                }
+
                 $red = $this->stretchChannel($rgba['red'], $min, $max);
                 $green = $this->stretchChannel($rgba['green'], $min, $max);
                 $blue = $this->stretchChannel($rgba['blue'], $min, $max);
@@ -272,35 +413,6 @@ final class GdImageProcessor
         }
 
         return $image;
-    }
-
-    /** @param resource $image @return resource */
-    private function resizeNearestNeighbor($image, int $targetWidth, int $targetHeight)
-    {
-        $sourceWidth = imagesx($image);
-        $sourceHeight = imagesy($image);
-        $resized = imagecreatetruecolor($targetWidth, $targetHeight);
-        $white = imagecolorallocate($resized, 255, 255, 255);
-        imagefill($resized, 0, 0, $white);
-
-        for ($targetX = 0; $targetX < $targetWidth; $targetX++) {
-            for ($targetY = 0; $targetY < $targetHeight; $targetY++) {
-                $sourceX = (int) floor($targetX * $sourceWidth / $targetWidth);
-                $sourceY = (int) floor($targetY * $sourceHeight / $targetHeight);
-                $sourceX = min($sourceX, $sourceWidth - 1);
-                $sourceY = min($sourceY, $sourceHeight - 1);
-
-                $rgba = $this->paletteService->readPixel($image, $sourceX, $sourceY);
-                if ($this->paletteService->isBackgroundPixel($rgba['red'], $rgba['green'], $rgba['blue'], $rgba['alpha'])) {
-                    continue;
-                }
-
-                $color = imagecolorallocate($resized, $rgba['red'], $rgba['green'], $rgba['blue']);
-                imagesetpixel($resized, $targetX, $targetY, $color);
-            }
-        }
-
-        return $resized;
     }
 
     private function stretchChannel(int $channel, int $min, int $max): int

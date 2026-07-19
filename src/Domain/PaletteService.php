@@ -9,7 +9,9 @@ use RuntimeException;
 final class PaletteService
 {
     private const ALPHA_WHITE_THRESHOLD = 128;
-    private const NEAR_WHITE_BRIGHTNESS = 240;
+    /** Brightness alone is not enough — light yellow/peach must stay as foreground. */
+    private const NEAR_WHITE_BRIGHTNESS = 245;
+    private const NEAR_WHITE_MAX_SATURATION = 28;
     private const COLOR_MERGE_DISTANCE = 120;
 
     /** @return list<string> */
@@ -61,8 +63,11 @@ final class PaletteService
      * @param resource $image
      * @return list<string>
      */
-    public function extractFromImage($image, int $maxColors = Palette::MAX_FOREGROUND_COLORS): array
-    {
+    public function extractFromImage(
+        $image,
+        int $maxColors = Palette::MAX_FOREGROUND_COLORS,
+        bool $mapToPencilSet = false,
+    ): array {
         $colorCounts = [];
         $width = imagesx($image);
         $height = imagesy($image);
@@ -74,7 +79,9 @@ final class PaletteService
                     continue;
                 }
 
-                $hex = $this->rgbToHex($rgba['red'], $rgba['green'], $rgba['blue']);
+                $hex = $mapToPencilSet
+                    ? $this->nearestPencilHex($rgba['red'], $rgba['green'], $rgba['blue'])
+                    : $this->rgbToHex($rgba['red'], $rgba['green'], $rgba['blue']);
                 $colorCounts[$hex] = ($colorCounts[$hex] ?? 0) + 1;
             }
         }
@@ -91,7 +98,7 @@ final class PaletteService
                 break;
             }
 
-            if ($this->isTooSimilarToExistingColors($hex, $palette)) {
+            if (!$mapToPencilSet && $this->isTooSimilarToExistingColors($hex, $palette)) {
                 continue;
             }
 
@@ -103,6 +110,56 @@ final class PaletteService
         }
 
         return $palette;
+    }
+
+    public function nearestPencilHex(int $red, int $green, int $blue): string
+    {
+        $bestHex = Palette::defaultForeground()[0];
+        $bestDistance = PHP_INT_MAX;
+
+        foreach ($this->pencilColorCandidates() as $candidate) {
+            $distance = $this->colorDistance(
+                $red,
+                $green,
+                $blue,
+                $candidate['r'],
+                $candidate['g'],
+                $candidate['b'],
+            );
+
+            if ($distance < $bestDistance) {
+                $bestDistance = $distance;
+                $bestHex = $candidate['hex'];
+            }
+        }
+
+        return $bestHex;
+    }
+
+    /**
+     * @param list<string> $foregroundPalette
+     */
+    public function quantizeToPencilGridIndex(
+        int $red,
+        int $green,
+        int $blue,
+        int $alpha,
+        array $foregroundPalette,
+    ): int {
+        if ($this->isBackgroundPixel($red, $green, $blue, $alpha)) {
+            return 0;
+        }
+
+        $pencilHex = $this->nearestPencilHex($red, $green, $blue);
+        $pencilRgb = $this->hexToRgb($pencilHex);
+
+        return $this->quantizeToGridIndex(
+            $pencilRgb['r'],
+            $pencilRgb['g'],
+            $pencilRgb['b'],
+            $alpha,
+            $foregroundPalette,
+        );
     }
 
     /**
@@ -265,8 +322,15 @@ final class PaletteService
         }
 
         $brightness = ($red * 0.299) + ($green * 0.587) + ($blue * 0.114);
+        if ($brightness < self::NEAR_WHITE_BRIGHTNESS) {
+            return false;
+        }
 
-        return $brightness >= self::NEAR_WHITE_BRIGHTNESS;
+        $maxChannel = max($red, $green, $blue);
+        $minChannel = min($red, $green, $blue);
+        $saturation = $maxChannel - $minChannel;
+
+        return $saturation <= self::NEAR_WHITE_MAX_SATURATION;
     }
 
     /** @param list<string> $existingColors */
@@ -291,6 +355,30 @@ final class PaletteService
     private function colorDistance(int $r1, int $g1, int $b1, int $r2, int $g2, int $b2): int
     {
         return abs($r1 - $r2) + abs($g1 - $g2) + abs($b1 - $b2);
+    }
+
+    /** @return list<array{hex: string, r: int, g: int, b: int}> */
+    private function pencilColorCandidates(): array
+    {
+        static $candidates = null;
+
+        if ($candidates !== null) {
+            return $candidates;
+        }
+
+        $candidates = [];
+
+        foreach (array_values(Palette::pencilSet()) as $hex) {
+            $rgb = $this->hexToRgb($hex);
+            $candidates[] = [
+                'hex' => strtolower($hex),
+                'r' => $rgb['r'],
+                'g' => $rgb['g'],
+                'b' => $rgb['b'],
+            ];
+        }
+
+        return $candidates;
     }
 
     private function isHexColor(string $value): bool
