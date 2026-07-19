@@ -112,41 +112,46 @@ function render_practice_exercise_formula(array $exercise, string $lang, int $in
     $columnBlankLabel = e(t('color_label', $lang) . ' ' . ($exercise['column'] ?? ''));
 
     $renderInput = static function (string $variant, string $label) use ($index): void {
-        echo '<input type="number" min="1" max="10" inputmode="numeric"'
+        echo '<input type="number" min="1" max="10" inputmode="numeric" autocomplete="off"'
             . ' class="practice-answer practice-answer--' . $variant . '"'
             . ' data-exercise-index="' . $index . '"'
             . ' aria-label="' . $label . '">';
     };
 
+    echo '<span class="practice-formula">';
+
     if ($isMultiplication) {
         if ($solveForRow) {
             $renderInput('row', $rowBlankLabel);
-            echo '<span>×</span>';
+            echo '<span class="practice-formula__op">×</span>';
             echo '<span class="exercise-green">' . e((string) $exercise['y']) . '</span>';
         } else {
             echo '<span class="exercise-blue">' . e((string) $exercise['x']) . '</span>';
-            echo '<span>×</span>';
+            echo '<span class="practice-formula__op">×</span>';
             $renderInput('column', $columnBlankLabel);
         }
 
-        echo '<span>=</span>';
+        echo '<span class="practice-formula__op">=</span>';
         echo '<span>' . e((string) $exercise['a']) . '</span>';
+        echo '</span>';
 
         return;
     }
 
     echo '<span>' . e((string) $exercise['a']) . '</span>';
-    echo '<span>÷</span>';
+    echo '<span class="practice-formula__op">÷</span>';
 
     if ($solveForRow) {
         $renderInput('row', $rowBlankLabel);
-        echo '<span>=</span>';
+        echo '<span class="practice-formula__op">=</span>';
         echo '<span class="exercise-green">' . e((string) $exercise['y']) . '</span>';
     } else {
         echo '<span class="exercise-blue">' . e((string) $exercise['x']) . '</span>';
-        echo '<span>=</span>';
+        echo '<span class="practice-formula__op">=</span>';
         $renderInput('column', $columnBlankLabel);
     }
+
+    echo '</span>';
 }
 
 function student_guide_url(string $lang): string

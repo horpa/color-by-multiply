@@ -45,6 +45,8 @@ return [
     'practice_wrong' => 'Próbáld újra',
     'practice_complete' => 'Szép munka! Kirajzoltad a teljes képet.',
     'practice_unavailable' => 'Először generálj munkalapot.',
+    'practice_progress_label' => 'Haladás',
+    'practice_progress' => '%d / %d',
     'wizard_step_upload' => 'Kép feltöltése',
     'wizard_step_edit' => 'Rács szerkesztése',
     'wizard_step_worksheet' => 'Munkalap',

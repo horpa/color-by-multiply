@@ -4,6 +4,9 @@
     const dataElement = document.getElementById('practice-data');
     const grid = document.getElementById('practice-grid');
     const completeBanner = document.getElementById('practice-complete');
+    const progressCount = document.getElementById('practice-progress-count');
+    const progressFill = document.getElementById('practice-progress-fill');
+    const progressRoot = document.getElementById('practice-progress');
 
     if (!dataElement || !grid) {
         return;
@@ -21,6 +24,7 @@
     const messages = payload.messages || {};
     const solved = new Set();
     let fireworksLaunched = false;
+    let activeItem = null;
 
     function launchFireworks() {
         if (fireworksLaunched || exercises.length === 0) {
@@ -144,9 +148,29 @@
         animationId = requestAnimationFrame(tick);
     }
 
+    function updateProgress() {
+        const total = exercises.length;
+        const done = solved.size;
+
+        if (progressCount) {
+            progressCount.textContent = done + ' / ' + total;
+        }
+
+        if (progressFill) {
+            const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+            progressFill.style.width = percent + '%';
+        }
+
+        if (progressRoot) {
+            progressRoot.setAttribute('aria-valuenow', String(done));
+            progressRoot.setAttribute('aria-valuemax', String(total));
+        }
+    }
+
     function celebrateCompletion() {
         if (completeBanner) {
             completeBanner.hidden = false;
+            completeBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         launchFireworks();
@@ -160,6 +184,26 @@
         return document.querySelector('.practice-exercise-item[data-exercise-index="' + index + '"]');
     }
 
+    function clearActiveHighlight() {
+        if (activeItem) {
+            activeItem.classList.remove('practice-exercise-item--active');
+            activeItem = null;
+        }
+    }
+
+    function highlightExercise(index) {
+        const item = findExerciseItem(index);
+
+        clearActiveHighlight();
+
+        if (!item || solved.has(index)) {
+            return;
+        }
+
+        item.classList.add('practice-exercise-item--active');
+        activeItem = item;
+    }
+
     function showFeedback(index, text, type) {
         const item = findExerciseItem(index);
 
@@ -171,16 +215,41 @@
 
         if (feedback) {
             feedback.textContent = text;
-            feedback.className = 'practice-feedback practice-feedback--' + type;
+            feedback.className = 'practice-feedback' + (type ? ' practice-feedback--' + type : '');
         }
+    }
+
+    function focusNextUnsolved(afterIndex) {
+        const inputs = Array.prototype.slice.call(document.querySelectorAll('.practice-answer:not(:disabled)'));
+
+        if (inputs.length === 0) {
+            return;
+        }
+
+        let next = inputs.find(function (input) {
+            return parseInt(input.dataset.exerciseIndex, 10) > afterIndex;
+        });
+
+        if (!next) {
+            next = inputs[0];
+        }
+
+        next.focus({ preventScroll: false });
+        next.select();
     }
 
     function markCorrect(exercise, input) {
         const cell = findCell(exercise.row, exercise.column);
+        const item = findExerciseItem(exercise.index);
 
         if (cell) {
             cell.style.backgroundColor = exercise.color;
             cell.classList.add('practice-grid-cell--filled');
+        }
+
+        if (item) {
+            item.classList.add('practice-exercise-item--solved');
+            item.classList.remove('practice-exercise-item--active');
         }
 
         input.classList.remove('practice-answer--wrong');
@@ -188,9 +257,15 @@
         input.disabled = true;
         solved.add(exercise.index);
         showFeedback(exercise.index, messages.correct || 'Correct!', 'correct');
+        updateProgress();
 
         if (solved.size === exercises.length) {
+            clearActiveHighlight();
             celebrateCompletion();
+        } else {
+            window.setTimeout(function () {
+                focusNextUnsolved(exercise.index);
+            }, 120);
         }
     }
 
@@ -239,6 +314,10 @@
             validateInput(input);
         });
 
+        input.addEventListener('focus', function () {
+            highlightExercise(parseInt(input.dataset.exerciseIndex, 10));
+        });
+
         input.addEventListener('input', function () {
             if (!input.disabled) {
                 input.classList.remove('practice-answer--wrong');
@@ -246,4 +325,6 @@
             }
         });
     });
+
+    updateProgress();
 })();

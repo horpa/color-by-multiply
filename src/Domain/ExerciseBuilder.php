@@ -19,7 +19,11 @@ final class ExerciseBuilder
             $exercises[] = $this->buildExercise($pixel, $index, $mode)->toArray();
         }
 
-        return $exercises;
+        if (count($exercises) > 1) {
+            shuffle($exercises);
+        }
+
+        return array_values($exercises);
     }
 
     /** @param array{row: int, column: int, hex: string, paletteIndex: int, colorIndex: int} $pixel */

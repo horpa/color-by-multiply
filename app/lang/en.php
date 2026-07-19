@@ -45,6 +45,8 @@ return [
     'practice_wrong' => 'Try again',
     'practice_complete' => 'Well done! You revealed the whole picture.',
     'practice_unavailable' => 'Generate a worksheet first.',
+    'practice_progress_label' => 'Progress',
+    'practice_progress' => '%d / %d',
     'wizard_step_upload' => 'Upload image',
     'wizard_step_edit' => 'Edit grid',
     'wizard_step_worksheet' => 'Your worksheet',

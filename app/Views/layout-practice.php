@@ -6,7 +6,9 @@
     <title><?= e($pageTitle ?? t('practice_title', $lang)) ?> — <?= e(t('page_title', $lang)) ?></title>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
 </head>
-<body>
-    <?= $content ?>
+<body class="practice-body">
+    <div class="practice-shell">
+        <?= $content ?>
+    </div>
 </body>
 </html>
