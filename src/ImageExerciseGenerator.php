@@ -71,9 +71,12 @@ class ImageExerciseGenerator
     }
 
     /** @return array{grid: list<list<array{paletteIndex: int}>>, palette: list<string>} */
-    public static function buildBlankEditor(): array
+    public static function buildBlankEditor(?string $presetId = null): array
     {
-        $palette = self::normalizePalette(Palette::blankCanvasForeground());
+        $presetId = is_string($presetId) && $presetId !== ''
+            ? $presetId
+            : Palette::DEFAULT_PRESET_ID;
+        $palette = self::normalizePalette(Palette::presetColors($presetId));
 
         return [
             'grid' => self::gridService()->emptyEditorGrid(),

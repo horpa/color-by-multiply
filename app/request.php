@@ -59,7 +59,11 @@ function handle_app_request(): array
             }
         } elseif (isset($_POST['start_blank_canvas'])) {
             unset($_SESSION['saved_worksheet_id'], $_SESSION['worksheet_result']);
-            $editorData = ImageExerciseGenerator::buildBlankEditor();
+            $presetId = (string) ($_POST['palette_preset'] ?? Palette::DEFAULT_PRESET_ID);
+            if (!in_array($presetId, Palette::presetIds(), true)) {
+                $presetId = Palette::DEFAULT_PRESET_ID;
+            }
+            $editorData = ImageExerciseGenerator::buildBlankEditor($presetId);
             $_SESSION['editor_grid'] = $editorData['grid'];
             $_SESSION['editor_palette'] = $editorData['palette'];
             $_SESSION['show_editor'] = true;

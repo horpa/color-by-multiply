@@ -12,7 +12,10 @@
     const colorInputsContainer = form.querySelector('.palette-color-inputs');
     const addColorButton = form.querySelector('.palette-add-button');
     const eraserButton = form.querySelector('.eraser-button');
-    const DEFAULT_NEW_COLORS = ['#e63946', '#2a9d8f', '#457b9d', '#e9c46a', '#f4a261', '#8338ec', '#06d6a0'];
+    const DEFAULT_NEW_COLORS = [
+        '#1a1a1a', '#5d4037', '#b71c1c', '#d81b60', '#f57c00', '#e8905c', '#fdd835',
+        '#7cb342', '#0288d1', '#2e7d32', '#0d47a1', '#6a1b9a',
+    ];
 
     const firstSwatch = form.querySelector('.palette-swatch');
     let activeIndex = firstSwatch ? parseInt(firstSwatch.dataset.paletteIndex, 10) : 1;

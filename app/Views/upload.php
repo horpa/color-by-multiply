@@ -2,7 +2,9 @@
 
 use Domain\Palette;
 
-$blankPalette = Palette::blankCanvasForeground();
+$palettePresets = Palette::presets();
+$defaultPresetId = Palette::DEFAULT_PRESET_ID;
+$defaultPresetColors = $palettePresets[$defaultPresetId];
 
 ?>
 <form method="post" enctype="multipart/form-data" class="panel">
@@ -43,15 +45,67 @@ $blankPalette = Palette::blankCanvasForeground();
     <h2 class="panel__title"><?= e(t('blank_canvas_title', $lang)) ?></h2>
     <p class="panel__lead"><?= e(t('blank_canvas_lead', $lang)) ?></p>
 
-    <div class="blank-palette-preview" aria-label="<?= e(t('color_label', $lang)) ?>">
-        <?php foreach ($blankPalette as $color): ?>
-            <span class="blank-palette-preview__swatch" style="background-color: <?= e($color) ?>"></span>
-        <?php endforeach; ?>
-    </div>
-
-    <form method="post" class="form-actions">
+    <form method="post" class="blank-canvas-form" id="blank-canvas-form">
         <input type="hidden" name="lang" value="<?= e($lang) ?>">
         <input type="hidden" name="start_blank_canvas" value="1">
-        <button type="submit" class="btn btn--secondary"><?= e(t('blank_canvas_button', $lang)) ?></button>
+        <input
+            type="hidden"
+            name="palette_preset"
+            id="palette-preset-input"
+            value="<?= e($defaultPresetId) ?>"
+        >
+
+        <details class="palette-picker" id="palette-picker">
+            <summary class="palette-picker__summary">
+                <span class="palette-picker__summary-text">
+                    <span class="palette-picker__summary-label"><?= e(t('palette_picker_label', $lang)) ?></span>
+                    <span class="palette-picker__summary-name" data-palette-summary-name>
+                        <?= e(t('palette_preset_' . $defaultPresetId, $lang)) ?>
+                    </span>
+                </span>
+                <span class="palette-strip palette-picker__summary-strip" data-palette-summary-strip aria-hidden="true">
+                    <?php foreach ($defaultPresetColors as $color): ?>
+                        <span class="palette-strip__swatch" style="background-color: <?= e($color) ?>"></span>
+                    <?php endforeach; ?>
+                </span>
+            </summary>
+
+            <ul class="palette-picker__list" role="listbox" aria-label="<?= e(t('palette_picker_label', $lang)) ?>">
+                <?php foreach ($palettePresets as $presetId => $colors): ?>
+                    <?php
+                        $isSelected = $presetId === $defaultPresetId;
+                        $presetLabel = t('palette_preset_' . $presetId, $lang);
+                    ?>
+                    <li class="palette-picker__item" role="presentation">
+                        <button
+                            type="button"
+                            class="palette-option<?= $isSelected ? ' palette-option--selected' : '' ?>"
+                            role="option"
+                            aria-selected="<?= $isSelected ? 'true' : 'false' ?>"
+                            data-preset-id="<?= e($presetId) ?>"
+                            data-preset-label="<?= e($presetLabel) ?>"
+                        >
+                            <span class="palette-option__name"><?= e($presetLabel) ?></span>
+                            <span class="palette-strip palette-option__strip" aria-hidden="true">
+                                <?php foreach ($colors as $color): ?>
+                                    <span
+                                        class="palette-strip__swatch"
+                                        style="background-color: <?= e($color) ?>"
+                                        data-color="<?= e($color) ?>"
+                                    ></span>
+                                <?php endforeach; ?>
+                            </span>
+                        </button>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </details>
+
+        <p class="palette-picker__hint"><?= e(t('palette_picker_hint', $lang)) ?></p>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--secondary"><?= e(t('blank_canvas_button', $lang)) ?></button>
+        </div>
     </form>
 </div>
+<script><?php readfile(APP_ROOT . '/public/js/palette-picker.js'); ?></script>
