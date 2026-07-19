@@ -110,6 +110,57 @@ color-by-multiply/
 
 ## Development
 
+### Local test environment
+
+**Option A — PHP on your machine (simplest if PHP is installed)**
+
+```powershell
+# Windows
+.\scripts\setup.ps1
+.\scripts\serve.ps1
+```
+
+```bash
+# macOS / Linux
+chmod +x scripts/setup.sh scripts/serve.sh
+./scripts/setup.sh
+./scripts/serve.sh
+```
+
+Or with Composer:
+
+```bash
+composer setup   # verify extensions and writable folders
+composer serve   # http://localhost:8080
+```
+
+**Option B — Docker (recommended if PHP is not installed)**
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+docker compose up --build
+```
+
+Open [http://localhost:8080](http://localhost:8080). Uploaded images and saved worksheets are stored in Docker volumes.
+
+**Windows: install PHP without Docker**
+
+```powershell
+winget install PHP.PHP.8.3
+```
+
+Then edit `php.ini` (path shown by `php --ini`) and enable:
+
+```ini
+extension=gd
+extension=fileinfo
+```
+
+Restart the terminal, run `.\scripts\setup.ps1`, then `.\scripts\serve.ps1`.
+
+### Architecture
+
 The app uses plain PHP with a lightweight autoloader in `app/bootstrap.php`. No framework or database is required.
 
 Main flow:

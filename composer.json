@@ -17,6 +17,8 @@
         ]
     },
     "scripts": {
-        "serve": "php -S localhost:8080 -t public"
+        "serve": "php -S localhost:8080 -t public",
+        "check": "php scripts/check.php",
+        "setup": "php scripts/check.php"
     }
 }

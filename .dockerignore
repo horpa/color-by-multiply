@@ -1,0 +1,9 @@
+.git
+.cursor
+uploads/*
+!uploads/.htaccess
+!uploads/.gitkeep
+storage/worksheets/*
+!storage/worksheets/.htaccess
+!storage/worksheets/.gitkeep
+app/config.local.php
