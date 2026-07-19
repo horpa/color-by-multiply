@@ -1,10 +1,10 @@
-# Color by Multiply — Felhasználói útmutató (Magyar)
+# Szorzós színező — Felhasználói útmutató (Magyar)
 
 Ez az útmutató bemutatja, hogyan készíthetsz nyomtatható szorzás- és osztásfeladatokat egy kis pixelképből. Tanároknak szól, akik 6–7 éves körüli gyerekekkel dolgoznak.
 
 ## Bevezetés
 
-A **Color by Multiply** egy képet 10×10-es színezős ráccssá alakít. Minden színes mező a rácson egy feladatot ad a **sora**, **oszlopa** és **színe** alapján.
+A **Szorzós színező** egy képet 10×10-es színezős ráccssá alakít. Minden színes mező a rácson egy feladatot ad a **sora**, **oszlopa** és **színe** alapján.
 
 A diákok a rács segítségével olvassák ki a sor- és oszlopszámokat, majd rövid szorzás- vagy osztásfeladatokat oldanak meg. A munkalap nyomtatásra kész: színtáblázat, feladatlista és megoldókulcs is jár hozzá.
 
@@ -12,7 +12,7 @@ Az alkalmazás **magyar** és **angol** nyelven használható.
 
 ## Első lépések
 
-1. Nyisd meg a Color by Multiply weboldalt a böngészőben.
+1. Nyisd meg a Szorzós színező weboldalt a böngészőben.
 2. Az oldal tetején válaszd ki a nyelvet:
    - **Magyar**
    - **English** (angol)

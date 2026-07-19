@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'page_title' => 'Color by Multiply',
-    'page_heading' => 'Color by Multiply',
+    'page_title' => 'Szorzós színező',
+    'page_heading' => 'Szorzós színező',
     'page_intro' => 'Tölts fel egy képet, szerkeszd a 10×10-es színezős rácsot, és generálj szorzás- és osztásfeladatokat.',
     'language_label' => 'Nyelv',
     'upload_file_label' => 'Kép kiválasztása',
