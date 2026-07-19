@@ -27,7 +27,6 @@ $practiceHref = $savedId !== null
                 <button type="submit" name="save_worksheet" value="1" class="btn btn--primary"><?= e(t('save_share_button', $lang)) ?></button>
             </form>
         <?php endif; ?>
-
         <button type="button" class="btn btn--secondary" onclick="window.print()"><?= e(t('print_preview', $lang)) ?></button>
         <a class="btn btn--secondary" href="<?= e($practiceHref) ?>" target="_blank" rel="noopener noreferrer"><?= e(t('practice_button', $lang)) ?></a>
     </div>
