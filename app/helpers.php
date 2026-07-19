@@ -171,6 +171,16 @@ function app_config(string $key, mixed $default = null): mixed
     return $config[$key] ?? $default;
 }
 
+function admin_key_ok(?string $provided): bool
+{
+    $expected = (string) app_config('admin_key', '');
+    if ($expected === '' || $provided === null || $provided === '') {
+        return false;
+    }
+
+    return hash_equals($expected, $provided);
+}
+
 function worksheet_repository(): Infrastructure\WorksheetRepository
 {
     static $repository = null;
@@ -221,12 +231,18 @@ function preview_url(string $id): string
     return '?preview=' . rawurlencode($id);
 }
 
-function library_url(string $lang): string
+function library_url(string $lang, ?string $adminKey = null): string
 {
-    return '?' . http_build_query([
+    $params = [
         'lang' => $lang,
         'home' => '1',
-    ]);
+    ];
+
+    if ($adminKey !== null && $adminKey !== '' && admin_key_ok($adminKey)) {
+        $params['key'] = $adminKey;
+    }
+
+    return '?' . http_build_query($params);
 }
 
 function format_worksheet_date(string $createdAt, string $lang): string

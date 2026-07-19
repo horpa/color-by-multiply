@@ -181,13 +181,19 @@ function handle_save_worksheet_post(string $lang): never
 function handle_delete_worksheet_post(): never
 {
     $lang = resolve_lang();
+    $adminKey = (string) ($_POST['key'] ?? '');
     $worksheetId = (string) ($_POST['worksheet_id'] ?? '');
+
+    if (!admin_key_ok($adminKey)) {
+        header('Location: ' . library_url($lang), true, 303);
+        exit;
+    }
 
     if ($worksheetId !== '') {
         worksheet_repository()->delete($worksheetId);
     }
 
-    header('Location: ' . library_url($lang), true, 303);
+    header('Location: ' . library_url($lang, $adminKey), true, 303);
     exit;
 }
 
@@ -468,7 +474,9 @@ function render_app_page(array $state): void
     $content .= render('partials/error', compact('error'));
 
     if ($wizardStep === 'home') {
-        $content .= render('library', compact('lang', 'libraryItems'));
+        $canDeleteWorksheets = admin_key_ok(isset($_GET['key']) ? (string) $_GET['key'] : null);
+        $adminKey = $canDeleteWorksheets ? (string) $_GET['key'] : '';
+        $content .= render('library', compact('lang', 'libraryItems', 'canDeleteWorksheets', 'adminKey'));
     } elseif ($wizardStep === 'upload') {
         $content .= render('upload', compact('lang'));
     } elseif ($wizardStep === 'edit') {

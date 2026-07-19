@@ -54,7 +54,7 @@ Point your web server **document root** to the `public/` directory.
 
 Ensure the `uploads/` and `storage/worksheets/` directories are writable by the web server process.
 
-Delete saved worksheets from the **library** page using the **Delete** button on each row.
+To delete saved worksheets, set `admin_key` in `app/config.local.php` (see `app/config.example.php`), then open the library with `?home=1&key=YOUR_SECRET`. Delete buttons appear only when that key is present and valid.
 
 ## Usage
 

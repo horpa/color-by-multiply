@@ -26,11 +26,14 @@
                             <span class="library-item__count"><?= e(sprintf(t('library_exercise_count', $lang), (int) $item['exerciseCount'])) ?></span>
                         </span>
                     </a>
-                    <form method="post" class="library-item__delete" onsubmit="return confirm('<?= e(t('delete_confirm', $lang)) ?>')">
-                        <input type="hidden" name="lang" value="<?= e($lang) ?>">
-                        <input type="hidden" name="worksheet_id" value="<?= e($item['id']) ?>">
-                        <button type="submit" name="delete_worksheet" value="1" class="btn btn--danger btn--small"><?= e(t('delete_button', $lang)) ?></button>
-                    </form>
+                    <?php if (!empty($canDeleteWorksheets)): ?>
+                        <form method="post" class="library-item__delete" onsubmit="return confirm('<?= e(t('delete_confirm', $lang)) ?>')">
+                            <input type="hidden" name="lang" value="<?= e($lang) ?>">
+                            <input type="hidden" name="key" value="<?= e($adminKey ?? '') ?>">
+                            <input type="hidden" name="worksheet_id" value="<?= e($item['id']) ?>">
+                            <button type="submit" name="delete_worksheet" value="1" class="btn btn--danger btn--small"><?= e(t('delete_button', $lang)) ?></button>
+                        </form>
+                    <?php endif; ?>
                 </li>
             <?php endforeach; ?>
         </ul>
