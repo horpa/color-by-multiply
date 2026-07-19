@@ -933,6 +933,7 @@ form { margin-bottom: 0; }
 }
 
 .practice-grid-card {
+    container-type: inline-size;
     padding: 0.85rem;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -941,7 +942,7 @@ form { margin-bottom: 0; }
 }
 
 .practice-grid {
-    --practice-cell: clamp(1.35rem, calc((100vw - 3.5rem) / 11), 2.25rem);
+    --practice-cell: clamp(1.25rem, calc((100cqi - 0.5rem) / 11), 2.25rem);
     display: block;
     width: fit-content;
     max-width: 100%;
@@ -951,11 +952,20 @@ form { margin-bottom: 0; }
     -webkit-overflow-scrolling: touch;
 }
 
+.practice-grid .print-grid-header,
+.practice-grid .print-grid-row {
+    flex-wrap: nowrap;
+}
+
 .practice-grid .print-grid-cell,
 .practice-grid .print-grid-label {
+    flex: 0 0 var(--practice-cell);
     width: var(--practice-cell);
     height: var(--practice-cell);
-    font-size: clamp(0.65rem, 2.4vw, 0.8rem);
+    max-width: var(--practice-cell);
+    max-height: var(--practice-cell);
+    aspect-ratio: 1 / 1;
+    font-size: clamp(0.65rem, calc(var(--practice-cell) * 0.4), 0.8rem);
 }
 
 .practice-color-legend {
